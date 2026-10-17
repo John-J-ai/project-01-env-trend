@@ -1,0 +1,58 @@
+name: Rebuild Analysis
+
+# 每次 push / 手动触发时自动重跑分析并提交更新后的图表。
+# 作用：让仓库保持"活跃且可复现"的状态 —— 招聘方点开 Actions 就能看到
+# 每次提交对应的真实运行记录，而不是一张不知道什么时候生成的静态图。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.py"
+      - "requirements.txt"
+  workflow_dispatch:   # 支持手动点按钮触发
+
+permissions:
+  contents: write       # 只给写权限，不给 administration
+
+concurrency:
+  group: rebuild-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analysis:
+    name: Run analysis & commit figures
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate dataset
+        run: python make_dataset.py
+
+      - name: Run analysis
+        run: python main.py
+
+      - name: Commit updated figures
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A output/
+          if git diff --staged --quiet; then
+            echo "图表无变化，跳过提交。"
+            exit 0
+          fi
+          git commit -m "chore: 重新生成分析图表 [skip ci]"
+          git push
