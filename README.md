@@ -1,6 +1,6 @@
 # Lingang Temperature Trend Analysis
 
-[中文说明](README.zh-CN.md) · [查看运行记录](https://github.com/John-J-ai/project-01-env-trend/actions)
+[在线报告](https://john-j-ai.github.io/project-01-env-trend/) · [中文说明](README.zh-CN.md) · [查看运行记录](https://github.com/John-J-ai/project-01-env-trend/actions)
 
 ![Analysis workflow](https://github.com/John-J-ai/project-01-env-trend/actions/workflows/rebuild.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.13-blue.svg)
